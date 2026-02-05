@@ -2,261 +2,274 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
+<title>نجم شدات ببجي</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PUBG Rewards</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:tahoma}
-body{background:#000;color:#fff;overflow:hidden}
-.hidden{display:none}
-
-/* خلفية */
-.bg{
-  position:fixed;inset:0;
-  background:url('file_000000004d7471f48dc12e2aa90a41b4.png') center/cover no-repeat;
-  animation:bg 18s linear infinite;
-  z-index:0
-}
-@keyframes bg{50%{transform:scale(1.05)}}
-
-/* أعلى */
-.top{
-  position:fixed;top:10px;right:10px;z-index:5;
-  display:flex;flex-direction:column;gap:6px
-}
-.top span{
-  background:rgba(0,0,0,.6);
-  padding:6px 10px;border-radius:12px;font-size:13px
+*{
+  box-sizing:border-box;
+  font-family:Tahoma, Arial;
 }
 
-/* كروت */
-.card{
-  position:relative;z-index:2;
-  background:rgba(0,0,0,.75);
-  margin:18px auto;padding:18px;
-  border-radius:18px;
-  max-width:380px;width:92%;
-  text-align:center
+body{
+  margin:0;
+  background:#0b0f1a;
+  color:#fff;
 }
-button,input{
-  width:100%;padding:14px;margin:8px 0;
-  border-radius:14px;border:none;font-size:16px
-}
-button{background:#ff7a00;color:#fff}
 
-/* سيارات */
-.grid{
-  display:grid;grid-template-columns:repeat(2,1fr);
-  gap:10px;margin-top:10px
+/* ====== الهيدر ====== */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 15px;
+  background:#11162a;
 }
-.carBox{
-  position:relative;border-radius:12px;
-  overflow:hidden;border:2px solid #555
-}
-.carBox img{
-  width:100%;height:110px;object-fit:cover
-}
-.badge{
-  position:absolute;top:6px;left:6px;
-  background:#000a;padding:3px 7px;
-  border-radius:8px;font-size:11px
-}
-.cost{
-  position:absolute;top:6px;right:6px;
-  background:#ff7a00;padding:3px 7px;
-  border-radius:8px;font-size:11px
-}
-.sel{border-color:#ff0}
 
-/* حركة السيارات */
-.cheap{animation:cheap 9s linear infinite}
-.gold{animation:gold 5s linear infinite;filter:drop-shadow(0 0 10px gold)}
-@keyframes cheap{to{transform:translateX(6px)}}
-@keyframes gold{50%{transform:translateX(10px) scale(1.05)}}
-
-/* عملات */
-.coin{
-  position:absolute;top:-40px;font-size:22px;
-  animation:fall linear infinite;z-index:1
+.logo{
+  font-size:16px;
+  font-weight:bold;
+  color:#ffd700;
 }
-@keyframes fall{to{top:110%}}
 
-.log{opacity:0;animation:fade .7s forwards;margin:6px 0}
-@keyframes fade{to{opacity:1}}
+.stats{
+  font-size:13px;
+}
+.stats span{
+  margin-left:10px;
+  color:#00ffcc;
+}
+
+/* ====== المحتوى ====== */
+.container{
+  padding:20px;
+  max-width:1000px;
+  margin:auto;
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* ====== الإدخال ====== */
+.input-box{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+input{
+  width:90%;
+  max-width:300px;
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:5px;
+}
+
+button{
+  padding:10px 25px;
+  border:none;
+  border-radius:5px;
+  background:#ffd700;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ====== السيارات ====== */
+.section{
+  margin-top:30px;
+}
+
+.cars{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:15px;
+}
+
+.car{
+  background:#161c33;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+  border:2px solid transparent;
+}
+
+.car img{
+  width:100%;
+  max-height:80px;
+  object-fit:contain;
+  transition:0.3s;
+}
+
+.car.selected{
+  border-color:#00ffcc;
+  transform:scale(0.95);
+}
+
+.car small{
+  display:block;
+  margin-top:5px;
+  color:#ccc;
+}
+
+/* ====== الصفحة الأخيرة ====== */
+#final{
+  display:none;
+  text-align:center;
+  margin-top:40px;
+}
+
+#final h2{
+  color:#00ffcc;
+}
 </style>
 </head>
 
 <body>
-<div class="bg"></div>
 
-<audio id="music" loop>
-<source src="CEL8-_mRkCE.mp3">
-</audio>
+<header>
+  <div class="logo">⭐ نجم شدات</div>
+  <div class="stats">
+    <span>💎 الشدات: <b id="uc">0</b></span>
+    <span>🎫 الكروت: <b id="cards">0</b></span>
+  </div>
+</header>
 
-<div class="top">
-  <span id="ucTop">UC: 0</span>
-  <span id="cardTop">كروت: 0</span>
+<div class="container">
+
+<h2>ادخل بياناتك</h2>
+
+<div class="input-box">
+  <input type="text" id="name" placeholder="اسمك">
+  <input type="text" id="code" placeholder="كود الشحن">
+  <br>
+  <button onclick="checkCode()">تأكيد الكود</button>
 </div>
 
-<div class="card" id="start">
-  <h2>🎮 جوائز PUBG</h2>
-  <button onclick="go()">دخول</button>
+<div id="carsSection" style="display:none;">
+
+<div class="section">
+<h3>🚗 اختر سيارة غالية (واحدة فقط)</h3>
+<div class="cars" id="expensive">
+  <div class="car" onclick="selectExp(this,100)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>100 كارت</small>
+  </div>
+  <div class="car" onclick="selectExp(this,80)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>80 كارت</small>
+  </div>
+  <div class="car" onclick="selectExp(this,60)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>60 كارت</small>
+  </div>
+  <div class="car" onclick="selectExp(this,40)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>40 كارت</small>
+  </div>
+</div>
 </div>
 
-<div class="card hidden" id="codeBox">
-  <input id="code" placeholder="كود الجائزة">
-  <input id="pid" placeholder="PUBG ID">
-  <button onclick="check()">متابعة</button>
+<div class="section">
+<h3>🚙 اختر 3 سيارات رخيصة</h3>
+<div class="cars" id="cheap">
+  <div class="car" onclick="selectCheap(this,10)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>10 كارت</small>
+  </div>
+  <div class="car" onclick="selectCheap(this,10)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>10 كارت</small>
+  </div>
+  <div class="car" onclick="selectCheap(this,10)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>10 كارت</small>
+  </div>
+  <div class="car" onclick="selectCheap(this,10)">
+    <img src="https://i.imgur.com/8Qf7Z5R.png">
+    <small>10 كارت</small>
+  </div>
+</div>
 </div>
 
-<div class="card hidden" id="ucBox">
-  <h3 id="ucText"></h3>
-  <button onclick="showData()">متابعة</button>
+<div style="text-align:center;margin-top:30px;">
+<button onclick="sendData()">إرسال البيانات</button>
 </div>
 
-<div class="card hidden" id="carsBox">
-  <h3 id="carsTitle"></h3>
-  <div class="grid" id="carsGrid"></div>
-  <button onclick="confirmCars()">تأكيد</button>
 </div>
 
-<div class="card hidden" id="dataBox">
-  <input id="name" placeholder="الاسم">
-  <input id="phone" placeholder="رقم الهاتف">
-  <button onclick="finish()">إرسال</button>
+<div id="final">
+  <h2>🔥 مبروك!</h2>
+  <p>تم استلام طلبك بنجاح</p>
+  <p>سيتم إضافة الشدات إلى حسابك خلال <b>48 ساعة</b></p>
+  <p>استعد للهيمنة في ببجي 🎮💥</p>
 </div>
 
-<div class="card hidden" id="result">
-  <h3>جاري التنفيذ</h3>
-  <div id="logs"></div>
 </div>
 
 <script>
-/* الصور */
-const cheapCars=[
-'IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٣٤٢٠.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٣٤٤٠.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٣٥٠٠.jpg'
-];
-const goldCars=[
-'IMG_٢٠٢٦٠٢٠٢_١٥٤٠٣٩.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٤٠٥٤.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٤١١٨.jpg',
-'IMG_٢٠٢٦٠٢٠٢_١٥٤١٣٥.jpg'
-];
+let cards=0;
+let uc=0;
+let cheapCount=0;
 
-/* الأكواد */
-const CODES={
-'negmprimo200911':{t:'uc',v:8600},
-'negmprimo200930':{t:'uc',v:11800},
-'2808aàwfŕA@№11':{t:'car',n:1,g:'cheap'},
-'2808aàwfŕA@№30':{t:'car',n:3,g:'cheap'},
-'VIP1-GOLD':{t:'car',n:1,g:'gold'},
-'VIP3-GOLD':{t:'car',n:3,g:'gold'}
-};
+function checkCode(){
+  let code=document.getElementById("code").value;
+  let name=document.getElementById("name").value;
 
-let maxSel=0,selected=[],mode='',usedKey='USED_IDS';
-
-function go(){
-  document.getElementById('music').play();
-  start.classList.add('hidden');
-  codeBox.classList.remove('hidden');
-  coins();
-}
-
-function coins(){
-  for(let i=0;i<12;i++){
-    let c=document.createElement('div');
-    c.className='coin';
-    c.style.left=Math.random()*90+'%';
-    c.style.animationDuration=(4+Math.random()*3)+'s';
-    c.innerText='🪙';
-    document.body.appendChild(c);
+  if(name=="" || code==""){
+    alert("كمل البيانات");
+    return;
   }
-}
 
-function check(){
-  let c=code.value.trim(),id=pid.value.trim();
-  if(!c||!id) return alert('أدخل الكود وID');
-  let used=JSON.parse(localStorage.getItem(usedKey)||'[]');
-  if(used.includes(id)) return alert('ID مستخدم');
-  if(!CODES[c]) return alert('كود غير صحيح');
-  localStorage.setItem(usedKey,JSON.stringify([...used,id]));
-  let o=CODES[c];
-  codeBox.classList.add('hidden');
-
-  if(o.t==='uc'){
-    ucTop.innerText='UC: '+o.v;
-    cardTop.innerText='كروت: 0';
-    ucText.innerText='🎁 ستحصل على '+o.v+' UC';
-    ucBox.classList.remove('hidden');
+  if(code==="123"){
+    uc=600;
+    cards=50;
   }else{
-    mode=o.g; maxSel=o.n; selected=[];
-    cardTop.innerText='كروت: '+maxSel;
-    ucTop.innerText='UC: 0';
-    renderCars(o.g==='cheap'?cheapCars:goldCars,o.g);
+    uc=300;
+    cards=20;
   }
+
+  document.getElementById("uc").innerText=uc;
+  document.getElementById("cards").innerText=cards;
+  document.getElementById("carsSection").style.display="block";
 }
 
-function renderCars(arr,type){
-  carsTitle.innerText='اختر '+maxSel+' سيارة';
-  carsGrid.innerHTML='';
-  arr.forEach(src=>{
-    let box=document.createElement('div');
-    box.className='carBox';
-    let img=document.createElement('img');
-    img.src=src;
-    img.className=type==='cheap'?'cheap':'gold';
-    let b=document.createElement('div');
-    b.className='badge'; b.innerText=type==='cheap'?'رخيص':'غالي';
-    let c=document.createElement('div');
-    c.className='cost'; c.innerText=type==='cheap'?'1 كارت':'3 كروت';
-    img.onclick=()=>{
-      if(box.classList.contains('sel')){
-        box.classList.remove('sel');
-        selected=selected.filter(x=>x!==src);
-      }else{
-        if(selected.length>=maxSel) return;
-        box.classList.add('sel'); selected.push(src);
-      }
-    };
-    box.append(img,b,c);
-    carsGrid.appendChild(box);
-  });
-  carsBox.classList.remove('hidden');
+function selectExp(el,value){
+  document.querySelectorAll("#expensive .car").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+  cards=value;
+  document.getElementById("cards").innerText=cards;
 }
 
-function confirmCars(){
-  if(selected.length!==maxSel) return alert('اختيار غير مكتمل');
-  carsBox.classList.add('hidden');
-  dataBox.classList.remove('hidden');
+function selectCheap(el,value){
+  if(el.classList.contains("selected")){
+    el.classList.remove("selected");
+    cheapCount--;
+    cards-=value;
+  }else{
+    if(cheapCount>=3){
+      alert("اختار 3 بس");
+      return;
+    }
+    el.classList.add("selected");
+    cheapCount++;
+    cards+=value;
+  }
+  document.getElementById("cards").innerText=cards;
 }
 
-function showData(){
-  ucBox.classList.add('hidden');
-  dataBox.classList.remove('hidden');
-}
-
-function finish(){
-  if(!name.value||!phone.value) return alert('أدخل البيانات');
-  dataBox.classList.add('hidden');
-  result.classList.remove('hidden');
-  let msgs=[
-    '⏳ جاري التعرف على الحساب...',
-    '🔍 التحقق من البيانات...',
-    '⚖️ تنفيذ الإجراءات...',
-    '🚀 تجهيز الإضافة...',
-    '🎉 تم! خلال 48 ساعة ستصل الجائزة إلى حسابك، استعد للمتعة!'
-  ];
-  let i=0;
-  let t=setInterval(()=>{
-    let p=document.createElement('div');
-    p.className='log'; p.innerText=msgs[i++];
-    logs.appendChild(p);
-    if(i===msgs.length) clearInterval(t);
-  },1200);
+function sendData(){
+  if(!document.querySelector("#expensive .selected") || cheapCount<3){
+    alert("كمل الاختيارات");
+    return;
+  }
+  document.getElementById("carsSection").style.display="none";
+  document.getElementById("final").style.display="block";
 }
 </script>
+
 </body>
 </html>
