@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>موقع جوائز PUBG</title>
+<style>
+*{box-sizing:border-box;font-family:Arial;}
+body{margin:0;background:#000;color:#fff;text-align:center;}
+#enterScreen{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+#enterScreen img{width:180px;margin-bottom:25px;}
+#enterBtn{padding:16px 50px;font-size:22px;background:#ffb400;color:#000;border:none;border-radius:10px;cursor:pointer;font-weight:bold;}
+#site{display:none;padding:20px;}
+.logo{width:140px;margin:10px auto;}
+.section{margin-top:30px;}
+.cards{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;}
+.card{width:220px;background:#111;border:2px solid #333;border-radius:10px;padding:10px;}
+.card img{width:100%;border-radius:8px;}
+.card button{margin-top:10px;width:100%;padding:10px;background:#ffb400;border:none;font-weight:bold;cursor:pointer;}
+input{width:90%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
+#mute{position:fixed;bottom:15px;right:15px;padding:10px;border-radius:50%;border:none;background:#ffb400;font-size:16px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- شاشة الدخول -->
+<div id="enterScreen">
+  <img src="images/unnamed.webp" alt="logo">
+  <button id="enterBtn">دخول موقع الجوائز</button>
+</div>
+
+<!-- الموقع -->
+<div id="site">
+  <img class="logo" src="images/unnamed.webp" alt="logo">
+
+  <div class="section">
+    <h2>شدّات PUBG</h2>
+    <div class="cards">
+      <div class="card" data-code="168646djcu">
+        <img src="images/images.jpeg" alt="11800 UC">
+        <p>11800 UC</p>
+        <input type="text" placeholder="ادخل الكود هنا">
+        <input type="text" placeholder="ادخل ID PUBG">
+        <button>استلام</button>
+      </div>
+      <div class="card" data-code="abc123xyz456">
+        <img src="images/images.jpeg" alt="8600 UC">
+        <p>8600 UC</p>
+        <input type="text" placeholder="ادخل الكود هنا">
+        <input type="text" placeholder="ادخل ID PUBG">
+        <button>استلام</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>سيارات بورش</h2>
+    <div class="cards">
+      <div class="card" data-code="car3card001">
+        <img src="images/IMG_٢٠٢٦٠٢٠٢_١٥٤١٣٥.jpg" alt="سيارة ×3 كروت">
+        <p>سيارة ×3 كروت (اختر سيارة واحدة)</p>
+        <input type="text" placeholder="ادخل الكود هنا">
+        <input type="text" placeholder="ادخل ID PUBG">
+        <button>استلام</button>
+      </div>
+      <div class="card" data-code="car1card003">
+        <img src="images/IMG_٢٠٢٦٠٢٠٢_١٥٤١١٨.jpg" alt="3 سيارات ×1 كرت">
+        <p>3 سيارات ×1 كرت (اختر ثلاث سيارات)</p>
+        <input type="text" placeholder="ادخل الكود هنا">
+        <input type="text" placeholder="ادخل ID PUBG">
+        <button>استلام</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="mute">🔊</button>
+
+<audio id="music" src="audio/CEL8-_mRkCE.mp3" loop></audio>
+
+<script>
+const enterBtn = document.getElementById("enterBtn");
+const enterScreen = document.getElementById("enterScreen");
+const site = document.getElementById("site");
+const music = document.getElementById("music");
+const muteBtn = document.getElementById("mute");
+
+// تشغيل الأغنية والدخول
+enterBtn.onclick = ()=>{
+  music.play();
+  localStorage.setItem("music","on");
+  enterScreen.style.display="none";
+  site.style.display="block";
+};
+
+// استمرار تشغيل الموسيقى في الصفحات الداخلية
+window.onload = ()=>{
+  if(localStorage.getItem("music")==="on"){
+    music.play().catch(()=>{});
+    enterScreen.style.display="none";
+    site.style.display="block";
+  }
+};
+
+// زر كتم الصوت
+muteBtn.onclick = ()=>{
+  if(music.paused){
+    music.play();
+    localStorage.setItem("music","on");
+    muteBtn.innerText="🔊";
+  }else{
+    music.pause();
+    localStorage.setItem("music","off");
+    muteBtn.innerText="🔇";
+  }
+};
+
+// الاستلام
+document.querySelectorAll(".card button").forEach(btn=>{
+  btn.onclick = ()=>{
+    const card = btn.parentElement;
+    const codeInput = card.querySelectorAll("input")[0].value.trim();
+    const idInput = card.querySelectorAll("input")[1].value.trim();
+    const correctCode = card.getAttribute("data-code");
+
+    if(!codeInput || !idInput){
+      alert("ادخل الكود و ID PUBG");
+      return;
+    }
+
+    // منع الاستلام أكثر من مرة
+    const usedKey = "used_" + correctCode + "_" + idInput;
+    if(localStorage.getItem(usedKey)){
+      alert("لقد تم استلام هذه الجائزة بالفعل لهذا الـ ID");
+      return;
+    }
+
+    if(codeInput === correctCode){
+      localStorage.setItem(usedKey,"true");
+      alert("تم استلام الجائزة بنجاح!");
+    }else{
+      alert("الكود غير صحيح!");
+    }
+  };
+});
+</script>
+
+</body>
+</html>
