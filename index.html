@@ -3,21 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <title>موقع جوائز PUBG</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box;font-family:Arial;}
-body{margin:0;background:#000;color:#fff;text-align:center;}
-#enterScreen{height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-#enterScreen img{width:180px;margin-bottom:25px;}
-#enterBtn{padding:16px 50px;font-size:22px;background:#ffb400;color:#000;border:none;border-radius:10px;cursor:pointer;font-weight:bold;}
-#site{display:none;padding:20px;}
-.logo{width:140px;margin:10px auto;}
-.section{margin-top:30px;}
-.cards{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;}
-.card{width:220px;background:#111;border:2px solid #333;border-radius:10px;padding:10px;}
-.card img{width:100%;border-radius:8px;}
-.card button{margin-top:10px;width:100%;padding:10px;background:#ffb400;border:none;font-weight:bold;cursor:pointer;}
-input{width:90%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
-#mute{position:fixed;bottom:15px;right:15px;padding:10px;border-radius:50%;border:none;background:#ffb400;font-size:16px;cursor:pointer;}
+*{box-sizing:border-box;font-family:Arial,sans-serif;margin:0;padding:0;}
+body{background:#000;color:#fff;text-align:center;overflow-x:hidden;}
+/* شاشة الدخول */
+#enterScreen{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  animation:fadeIn 1s ease-in;
+}
+#enterScreen img{width:50%;max-width:220px;margin-bottom:25px;}
+#enterBtn{
+  padding:18px 60px;font-size:24px;
+  background:#ffb400;color:#000;
+  border:none;border-radius:12px;
+  cursor:pointer;font-weight:bold;
+  transition:transform 0.1s;
+}
+#enterBtn:active{transform:scale(0.95);}
+
+/* صفحة الجوائز */
+#site{display:none;padding:10px;}
+.logo{width:40%;max-width:180px;margin:10px auto;}
+
+/* أقسام الجوائز */
+.section{margin-top:25px;animation:fadeInUp 0.8s ease-out;}
+.cards{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
+.card{
+  flex:1 1 45%;
+  max-width:260px;
+  background:#111;
+  border:2px solid #333;
+  border-radius:12px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transition:transform 0.1s;
+}
+.card:hover{transform:scale(1.03);}
+.card img{width:100%;border-radius:10px;}
+.card p{font-size:18px;margin:10px 0;}
+.card input{
+  width:90%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  border:none;
+  font-size:16px;
+}
+.card button{
+  width:95%;
+  padding:12px;
+  margin-top:10px;
+  background:#ffb400;
+  border:none;
+  font-weight:bold;
+  font-size:18px;
+  cursor:pointer;
+  border-radius:8px;
+  transition:transform 0.1s;
+}
+.card button:active{transform:scale(0.95);}
+
+/* زر كتم الصوت */
+#mute{
+  position:fixed;
+  bottom:15px;right:15px;
+  padding:12px;border-radius:50%;
+  border:none;background:#ffb400;font-size:18px;
+  cursor:pointer;z-index:1000;
+}
+
+/* انيميشن سلس */
+@keyframes fadeIn {0%{opacity:0;}100%{opacity:1;}}
+@keyframes fadeInUp {0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
@@ -78,13 +142,13 @@ input{width:90%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
 <audio id="music" src="audio/CEL8-_mRkCE.mp3" loop></audio>
 
 <script>
+// دخول وتشغيل الموسيقى
 const enterBtn = document.getElementById("enterBtn");
 const enterScreen = document.getElementById("enterScreen");
 const site = document.getElementById("site");
 const music = document.getElementById("music");
 const muteBtn = document.getElementById("mute");
 
-// تشغيل الأغنية والدخول
 enterBtn.onclick = ()=>{
   music.play();
   localStorage.setItem("music","on");
@@ -92,7 +156,7 @@ enterBtn.onclick = ()=>{
   site.style.display="block";
 };
 
-// استمرار تشغيل الموسيقى في الصفحات الداخلية
+// استمرار الموسيقى عند فتح الموقع
 window.onload = ()=>{
   if(localStorage.getItem("music")==="on"){
     music.play().catch(()=>{});
@@ -114,7 +178,7 @@ muteBtn.onclick = ()=>{
   }
 };
 
-// الاستلام
+// نظام الاستلام + منع التكرار
 document.querySelectorAll(".card button").forEach(btn=>{
   btn.onclick = ()=>{
     const card = btn.parentElement;
@@ -143,6 +207,5 @@ document.querySelectorAll(".card button").forEach(btn=>{
   };
 });
 </script>
-
 </body>
 </html>
