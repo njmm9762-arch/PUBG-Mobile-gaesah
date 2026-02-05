@@ -6,28 +6,26 @@
 <title>شحن PUBG Mobile</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:tahoma}
-body{background:#000;color:#fff;overflow:hidden;position:relative}
+body{background:#000;color:#fff;overflow:hidden;position:relative;font-size:16px}
 .hidden{display:none}
 .overlay{position:relative;z-index:2;padding:20px;text-align:center}
-.card{background:rgba(0,0,0,.65);border-radius:18px;padding:20px;margin:15px auto;max-width:420px}
-h1,h2{margin:10px 0}
-input,button{width:100%;padding:16px;font-size:18px;border-radius:14px;border:none;margin:8px 0}
+.card{background:rgba(0,0,0,.75);border-radius:18px;padding:20px;margin:15px auto;max-width:400px;width:90%;}
+h1,h2{margin:10px 0;font-weight:bold}
+input,button{width:100%;padding:14px;font-size:16px;border-radius:12px;border:none;margin:8px 0}
 button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;overflow:hidden;}
-.grid img{width:100%;border-radius:10px;border:2px solid #fff;transition:transform 1.2s ease-in-out;}
-.grid img.sel{border-color:#ff9800;transform:translateX(0)}
-.log{font-size:18px;opacity:0;animation:fade .8s forwards;margin:5px 0}
-@keyframes fade{to{opacity:1}}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;position:relative;overflow:hidden;margin-top:10px;}
+.grid img{width:100%;border-radius:10px;border:2px solid #fff;transition:transform 0.5s ease;}
+.grid img.sel{border-color:#ff0;transform:scale(1.05);}
+.top-icons{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;align-items:flex-end;z-index:2}
+.top-icons span{background:rgba(0,0,0,.5);padding:5px 10px;margin:3px;border-radius:10px;font-size:14px;}
+.car-anim{position:absolute;bottom:120px;width:70px;animation:carMove linear infinite;}
+@keyframes carMove{0%{left:-100px}100%{left:110%}}
 .coin{position:absolute;top:-50px;font-size:24px;animation:fall linear infinite;z-index:1}
 @keyframes fall{0%{top:-50px}100%{top:110%}}
 .bg{position:fixed;inset:0;background:url('file_000000004d7471f48dc12e2aa90a41b4.png') center/cover no-repeat;animation:bgMove 20s linear infinite;z-index:0;}
 @keyframes bgMove{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
-.bottom-logos{position:absolute;bottom:10px;width:100%;display:flex;justify-content:space-around;z-index:2}
-.bottom-logos img{width:50px;pointer-events:none}
-.top-icons{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;align-items:flex-end;z-index:2}
-.top-icons span{background:rgba(0,0,0,.5);padding:5px 10px;margin:3px;border-radius:10px;font-size:16px;}
-.car-anim{position:absolute;bottom:120px;width:80px;animation:carMove linear infinite;}
-@keyframes carMove{0%{left:-100px}100%{left:110%}}
+.log{font-size:14px;opacity:0;animation:fade .8s forwards;margin:5px 0}
+@keyframes fade{to{opacity:1}}
 </style>
 </head>
 <body>
@@ -76,11 +74,6 @@ button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:poin
 <div id="result" class="card hidden">
 <h2>جارٍ التنفيذ</h2>
 <div id="logs"></div>
-</div>
-
-<div class="bottom-logos">
-<img src="images.jpeg" alt="لوجو شدات">
-<img src="IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg" alt="لوجو سيارات">
 </div>
 
 <script>
@@ -136,14 +129,12 @@ if(o.t==='uc'){
 mode='uc';
 ucTotal=o.v;
 document.getElementById('ucAmount').innerText=`🎁 ستستلم ${o.v} UC`;
-document.getElementById('ucIcon').classList.remove('hidden');
 ucBox.classList.remove('hidden');
 updateTopCounts();
 }else{
 mode='car';
 maxSel=o.n;
 renderCars(o.g==='cheap'?cheap:gold);
-document.getElementById('carIcon').classList.remove('hidden');
 updateTopCounts();
 }
 }
