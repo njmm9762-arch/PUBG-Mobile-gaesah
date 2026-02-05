@@ -6,148 +6,219 @@
 <title>موقع جوائز PUBG</title>
 
 <style>
-*{box-sizing:border-box;font-family:tahoma}
-body{
-margin:0;
-background:#0b0b0b;
-color:#fff;
-text-align:center;
-}
-.hidden{display:none}
+*{box-sizing:border-box;font-family:tahoma;margin:0;padding:0;}
+body{overflow-x:hidden;background:#000;color:#fff;text-align:center;position:relative;}
+
+.hidden{display:none;}
 
 button{
-width:90%;
-padding:18px;
-font-size:22px;
-border:none;
-border-radius:14px;
-margin:10px auto;
-background:linear-gradient(135deg,#ff9800,#ff5722);
-color:#fff;
-cursor:pointer;
+width:90%;padding:18px;font-size:22px;border:none;border-radius:14px;margin:10px auto;display:block;
+background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer;
 }
-
 input{
-width:90%;
-padding:16px;
-font-size:20px;
-border-radius:12px;
-border:none;
-margin:10px auto;
-display:block;
-text-align:center;
+width:90%;padding:16px;font-size:20px;border-radius:12px;border:none;margin:10px auto;display:block;text-align:center;
+}
+img{width:85%;max-width:350px;border-radius:16px;margin:15px auto;display:block;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+
+.section{padding:25px;position:relative;z-index:10;}
+
+.background{
+position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
+background:url('file_000000004d7471f48dc12e2aa90a41b4.png') no-repeat center center/cover;
+overflow:hidden;
 }
 
-img{
-width:85%;
-max-width:350px;
-border-radius:16px;
-margin:15px auto;
-animation:float 3s ease-in-out infinite;
-}
-
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-8px)}
-100%{transform:translateY(0)}
-}
-
-.section{
-padding:25px;
-}
+.money, .pubg, .car{position:absolute;width:50px;opacity:0.8;}
+.money{top:-50px;}
+.pubg{top:-60px;}
+.car{top:-70px;}
 </style>
 </head>
-
 <body>
+
+<!-- الخلفية المتحركة -->
+<div class="background"></div>
 
 <!-- موسيقى -->
 <audio id="bgm" loop>
 <source src="CEL8-_mRkCE.mp3" type="audio/mpeg">
 </audio>
 
-<!-- دخول -->
+<!-- شاشة دخول -->
 <div id="enter" class="section">
 <h1>🎁 موقع الجوائز</h1>
 <button onclick="enterSite()">دخول الموقع</button>
 </div>
 
-<!-- اختيار -->
+<!-- اختيار الجائزة -->
 <div id="choose" class="section hidden">
 <h2>اختر نوع الجائزة</h2>
-
 <img src="images.jpeg">
 <button onclick="selectPrize('uc')">استلام شدات</button>
-
 <img src="IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg">
 <button onclick="selectPrize('car')">استلام سيارات</button>
 </div>
 
-<!-- إدخال بيانات -->
+<!-- إدخال الكود -->
 <div id="form" class="section hidden">
 <h2 id="title"></h2>
-
 <input id="code" placeholder="أدخل كود الجائزة">
 <input id="pubgId" placeholder="أدخل ID PUBG">
-
 <button onclick="submitPrize()">تم</button>
 </div>
 
-<!-- نتيجة -->
+<!-- اختيار السيارات -->
+<div id="carSelect" class="section hidden">
+<h2>اختر سيارتك</h2>
+<div id="carOptions"></div>
+<button onclick="confirmCar()">تم الاختيار</button>
+</div>
+
+<!-- إدخال البيانات الشخصية -->
+<div id="personalData" class="section hidden">
+<h2>الرجاء إدخال بياناتك</h2>
+<input id="name" placeholder="الاسم">
+<input id="phone" placeholder="رقم التليفون">
+<button onclick="submitPersonal()">تم</button>
+</div>
+
+<!-- رسالة الشكر -->
 <div id="result" class="section hidden">
 <h2 id="resultText"></h2>
 </div>
 
 <script>
+// ======== حركة الخلفية ========
+const bg = document.querySelector('.background');
+const numMoney = 15;
+const numPubg = 8;
+const numCar = 6;
+
+function createFalling(className){
+  for(let i=0;i<15;i++){
+    let el = document.createElement('div');
+    el.classList.add(className);
+    el.style.left=Math.random()*100+"%";
+    el.style.animationDuration=(5+Math.random()*5)+"s";
+    el.style.animationDelay=(Math.random()*5)+"s";
+    el.style.backgroundImage="url('file_000000004d7471f48dc12e2aa90a41b4.png')";
+    el.style.backgroundSize="contain";
+    el.style.width="50px";
+    el.style.height="50px";
+    bg.appendChild(el);
+  }
+}
+
+createFalling('money');
+createFalling('pubg');
+createFalling('car');
+
+// ======== نظام الجوائز ========
 const usedKey = "USED_PUBG_IDS";
 let currentType = "";
+let selectedCar = [];
+let carGroup = [];
 
 const codes = {
-"UC11800_X9Q2A7LDM8F3": "11800 UC",
-"UC8600_MK7P4ZQ9R2E8": "8600 UC",
-"CAR_ONE_8_JF9Q2M7XDL4": "سيارة واحدة من 8",
-"CAR_THREE_8_Z8M2QK9PFX7": "ثلاث سيارات من 8"
+"UC11800_X9Q2A7LDM8F3": {type:"uc", value:"11800 UC"},
+"UC8600_MK7P4ZQ9R2E8": {type:"uc", value:"8600 UC"},
+"CAR_ONE_R1": {type:"car1", group:"r", select:1},
+"CAR_THREE_R3": {type:"car3", group:"r", select:3},
+"CAR_ONE_AM1": {type:"car1", group:"g", select:1},
+"CAR_THREE_AM3": {type:"car3", group:"g", select:3}
 };
 
+const carImages = {
+"r":["IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٤٢٠.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٤٤٠.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٥٠٠.jpg"],
+"g":["IMG_٢٠٢٦٠٢٠٢_١٥٤٠٣٩.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤٠٥٤.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤١١٨.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤١٣٥.jpg"]
+};
+
+// ======== وظائف الموقع ========
 function enterSite(){
-document.getElementById("bgm").play();
-document.getElementById("enter").classList.add("hidden");
-document.getElementById("choose").classList.remove("hidden");
+  document.getElementById("bgm").play();
+  document.getElementById("enter").classList.add("hidden");
+  document.getElementById("choose").classList.remove("hidden");
 }
 
 function selectPrize(type){
-currentType = type;
-document.getElementById("choose").classList.add("hidden");
-document.getElementById("form").classList.remove("hidden");
-document.getElementById("title").innerText =
-type==="uc" ? "💰 استلام شدات" : "🚗 استلام سيارات";
+  currentType = type;
+  document.getElementById("choose").classList.add("hidden");
+  document.getElementById("form").classList.remove("hidden");
+  document.getElementById("title").innerText =
+    type==="uc" ? "💰 استلام شدات" : "🚗 استلام سيارات";
 }
 
 function submitPrize(){
-const code = document.getElementById("code").value.trim();
-const id = document.getElementById("pubgId").value.trim();
+  const code = document.getElementById("code").value.trim();
+  const id = document.getElementById("pubgId").value.trim();
+  if(!code || !id){alert("أدخل الكود و ID");return;}
+  let used = JSON.parse(localStorage.getItem(usedKey)||"[]");
+  if(used.includes(id)){alert("❌ هذا الـ ID استلم جائزة من قبل");return;}
+  if(!codes[code]){alert("❌ كود غير صحيح");return;}
+  
+  // حفظ ID لمنع التكرار
+  localStorage.setItem(usedKey,JSON.stringify([...used,id]));
 
-if(!code || !id){alert("أدخل الكود و ID");return;}
-
-let used = JSON.parse(localStorage.getItem(usedKey)||"[]");
-if(used.includes(id)){
-alert("❌ هذا الـ ID استلم جائزة من قبل");
-return;
+  const prize = codes[code];
+  if(prize.type==="uc"){
+    document.getElementById("form").classList.add("hidden");
+    document.getElementById("personalData").classList.remove("hidden");
+    document.getElementById("resultText").innerText = prize.value;
+  }else{
+    // سيارات
+    carGroup = carImages[prize.group];
+    selectedCar = [];
+    document.getElementById("form").classList.add("hidden");
+    document.getElementById("carSelect").classList.remove("hidden");
+    renderCarOptions(prize.select);
+  }
 }
 
-if(!codes[code]){
-alert("❌ كود غير صحيح");
-return;
+// ======== اختيار السيارات ========
+function renderCarOptions(maxSelect){
+  const container = document.getElementById("carOptions");
+  container.innerHTML="";
+  carGroup.forEach((src,index)=>{
+    const img = document.createElement("img");
+    img.src=src;
+    img.style.width="120px";
+    img.style.margin="5px";
+    img.style.border="2px solid #fff";
+    img.style.cursor="pointer";
+    img.onclick=function(){
+      if(selectedCar.includes(src)){
+        selectedCar = selectedCar.filter(s=>s!==src);
+        img.style.border="2px solid #fff";
+      }else{
+        if(selectedCar.length<maxSelect){
+          selectedCar.push(src);
+          img.style.border="4px solid #ff9800";
+        }else{
+          alert(`يمكنك اختيار ${maxSelect} فقط`);
+        }
+      }
+    }
+    container.appendChild(img);
+  });
 }
 
-used.push(id);
-localStorage.setItem(usedKey,JSON.stringify(used));
+function confirmCar(){
+  if(selectedCar.length===0){alert("اختر سياراتك أولاً");return;}
+  document.getElementById("carSelect").classList.add("hidden");
+  document.getElementById("personalData").classList.remove("hidden");
+}
 
-document.getElementById("form").classList.add("hidden");
-document.getElementById("result").classList.remove("hidden");
-document.getElementById("resultText").innerText =
-"✅ تم تسجيل الجائزة: " + codes[code];
+// ======== البيانات الشخصية ========
+function submitPersonal(){
+  const name=document.getElementById("name").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+  if(!name || !phone){alert("أدخل بياناتك كاملة");return;}
+  document.getElementById("personalData").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("resultText").innerText=
+  `شكراً لتعاملك معنا.\nسيتم إضافة الجوائز التي اخترتها (${currentType==="uc"?"شدات":"سيارات"}) إلى حسابك في PUBG Mobile خلال 48 ساعة.`;
 }
 </script>
-
 </body>
 </html>
