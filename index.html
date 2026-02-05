@@ -3,221 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>موقع جوائز PUBG</title>
-
+<title>شحن PUBG Mobile</title>
 <style>
-*{box-sizing:border-box;font-family:tahoma;margin:0;padding:0;}
-body{overflow-x:hidden;background:#000;color:#fff;text-align:center;position:relative;}
-
-.hidden{display:none;}
-
-button{
-width:90%;padding:18px;font-size:22px;border:none;border-radius:14px;margin:10px auto;display:block;
-background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer;
+*{box-sizing:border-box;font-family:tahoma}
+body{margin:0;color:#fff;background:#000;overflow:hidden}
+.hidden{display:none}
+.bg{
+position:fixed;inset:0;
+background:url('file_000000004d7471f48dc12e2aa90a41b4.png') center/cover no-repeat;
+animation:bgMove 20s linear infinite;
 }
-input{
-width:90%;padding:16px;font-size:20px;border-radius:12px;border:none;margin:10px auto;display:block;text-align:center;
+@keyframes bgMove{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+.overlay{position:relative;z-index:2;padding:20px;text-align:center}
+.card{background:rgba(0,0,0,.65);border-radius:18px;padding:20px;margin:15px auto;max-width:420px}
+h1,h2{margin:10px 0}
+input,button{
+width:100%;padding:16px;font-size:18px;border-radius:14px;border:none;margin:8px 0
 }
-img{width:85%;max-width:350px;border-radius:16px;margin:15px auto;display:block;animation:float 3s ease-in-out infinite;}
-@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
-
-.section{padding:25px;position:relative;z-index:10;}
-
-.background{
-position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
-background:url('file_000000004d7471f48dc12e2aa90a41b4.png') no-repeat center center/cover;
-overflow:hidden;
-}
-
-.money, .pubg, .car{position:absolute;width:50px;opacity:0.8;}
-.money{top:-50px;}
-.pubg{top:-60px;}
-.car{top:-70px;}
+button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid img{width:100%;border-radius:14px;border:3px solid #fff;cursor:pointer}
+.grid img.sel{border-color:#ff9800}
+.log{font-size:18px;opacity:0;animation:fade .8s forwards}
+@keyframes fade{to{opacity:1}}
 </style>
 </head>
 <body>
 
-<!-- الخلفية المتحركة -->
-<div class="background"></div>
+<div class="bg"></div>
 
-<!-- موسيقى -->
 <audio id="bgm" loop>
 <source src="CEL8-_mRkCE.mp3" type="audio/mpeg">
 </audio>
 
-<!-- شاشة دخول -->
-<div id="enter" class="section">
-<h1>🎁 موقع الجوائز</h1>
-<button onclick="enterSite()">دخول الموقع</button>
+<div class="overlay">
+
+<div id="enter" class="card">
+<h1>🎮 شحن PUBG Mobile</h1>
+<button onclick="start()">دخول</button>
 </div>
 
-<!-- اختيار الجائزة -->
-<div id="choose" class="section hidden">
-<h2>اختر نوع الجائزة</h2>
-<img src="images.jpeg">
-<button onclick="selectPrize('uc')">استلام شدات</button>
-<img src="IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg">
-<button onclick="selectPrize('car')">استلام سيارات</button>
+<div id="codeBox" class="card hidden">
+<h2>أدخل كود الشحن</h2>
+<input id="code" placeholder="كود الشحن">
+<input id="pid" placeholder="ID PUBG">
+<button onclick="checkCode()">متابعة</button>
 </div>
 
-<!-- إدخال الكود -->
-<div id="form" class="section hidden">
-<h2 id="title"></h2>
-<input id="code" placeholder="أدخل كود الجائزة">
-<input id="pubgId" placeholder="أدخل ID PUBG">
-<button onclick="submitPrize()">تم</button>
+<div id="cars" class="card hidden">
+<h2 id="carsTitle"></h2>
+<div class="grid" id="carsGrid"></div>
+<button onclick="confirmCars()">تأكيد الاختيار</button>
 </div>
 
-<!-- اختيار السيارات -->
-<div id="carSelect" class="section hidden">
-<h2>اختر سيارتك</h2>
-<div id="carOptions"></div>
-<button onclick="confirmCar()">تم الاختيار</button>
-</div>
-
-<!-- إدخال البيانات الشخصية -->
-<div id="personalData" class="section hidden">
-<h2>الرجاء إدخال بياناتك</h2>
+<div id="data" class="card hidden">
+<h2>بياناتك</h2>
 <input id="name" placeholder="الاسم">
 <input id="phone" placeholder="رقم التليفون">
-<button onclick="submitPersonal()">تم</button>
+<button onclick="finalize()">إرسال</button>
 </div>
 
-<!-- رسالة الشكر -->
-<div id="result" class="section hidden">
-<h2 id="resultText"></h2>
+<div id="result" class="card hidden">
+<h2>جارٍ التنفيذ</h2>
+<div id="logs"></div>
+</div>
+
 </div>
 
 <script>
-// ======== حركة الخلفية ========
-const bg = document.querySelector('.background');
-const numMoney = 15;
-const numPubg = 8;
-const numCar = 6;
+const USED="USED_IDS";
+let mode=null, maxSel=0, selected=[];
+const cheap=[
+'IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٣٤٢٠.jpg',
+'IMG_٢٠٢٦٠٢٠٢_١٥٣٤٤٠.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٣٥٠٠.jpg'
+];
+const gold=[
+'IMG_٢٠٢٦٠٢٠٢_١٥٤٠٣٩.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٤٠٥٤.jpg',
+'IMG_٢٠٢٦٠٢٠٢_١٥٤١١٨.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٤١٣٥.jpg'
+];
 
-function createFalling(className){
-  for(let i=0;i<15;i++){
-    let el = document.createElement('div');
-    el.classList.add(className);
-    el.style.left=Math.random()*100+"%";
-    el.style.animationDuration=(5+Math.random()*5)+"s";
-    el.style.animationDelay=(Math.random()*5)+"s";
-    el.style.backgroundImage="url('file_000000004d7471f48dc12e2aa90a41b4.png')";
-    el.style.backgroundSize="contain";
-    el.style.width="50px";
-    el.style.height="50px";
-    bg.appendChild(el);
-  }
-}
-
-createFalling('money');
-createFalling('pubg');
-createFalling('car');
-
-// ======== نظام الجوائز ========
-const usedKey = "USED_PUBG_IDS";
-let currentType = "";
-let selectedCar = [];
-let carGroup = [];
-
-const codes = {
-"UC11800_X9Q2A7LDM8F3": {type:"uc", value:"11800 UC"},
-"UC8600_MK7P4ZQ9R2E8": {type:"uc", value:"8600 UC"},
-"CAR_ONE_R1": {type:"car1", group:"r", select:1},
-"CAR_THREE_R3": {type:"car3", group:"r", select:3},
-"CAR_ONE_AM1": {type:"car1", group:"g", select:1},
-"CAR_THREE_AM3": {type:"car3", group:"g", select:3}
+const CODES={
+'negmprimo200911':{t:'uc',v:'8600 UC'},
+'negmprimo200930':{t:'uc',v:'11800 UC'},
+'2808aàwfŕA@№11':{t:'car',g:'cheap',n:1},
+'2808aàwfŕA@№30':{t:'car',g:'cheap',n:3},
+'VIP1-GOLD-9XQ':{t:'car',g:'gold',n:1},
+'VIP3-GOLD-7LM':{t:'car',g:'gold',n:3},
 };
 
-const carImages = {
-"r":["IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٤٢٠.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٤٤٠.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٣٥٠٠.jpg"],
-"g":["IMG_٢٠٢٦٠٢٠٢_١٥٤٠٣٩.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤٠٥٤.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤١١٨.jpg","IMG_٢٠٢٦٠٢٠٢_١٥٤١٣٥.jpg"]
+function start(){
+document.getElementById('bgm').play();
+enter.classList.add('hidden');
+codeBox.classList.remove('hidden');
+}
+
+function checkCode(){
+const c=code.value.trim(), id=pid.value.trim();
+if(!c||!id) return alert('أكمل البيانات');
+let used=JSON.parse(localStorage.getItem(USED)||'[]');
+if(used.includes(id)) return alert('هذا ID استلم من قبل');
+if(!CODES[c]) return alert('كود غير صحيح');
+localStorage.setItem(USED,JSON.stringify([...used,id]));
+
+const o=CODES[c];
+codeBox.classList.add('hidden');
+
+if(o.t==='uc'){
+mode='uc';
+data.classList.remove('hidden');
+}else{
+mode='car';
+maxSel=o.n;
+render(o.g==='cheap'?cheap:gold);
+}
+}
+
+function render(arr){
+selected=[];
+carsTitle.innerText=`اختر ${maxSel} سيارة`;
+carsGrid.innerHTML='';
+arr.forEach(src=>{
+const im=document.createElement('img');
+im.src=src;
+im.onclick=()=>{
+if(im.classList.contains('sel')){
+im.classList.remove('sel');
+selected=selected.filter(x=>x!==src);
+}else{
+if(selected.length>=maxSel) return alert(`مسموح ${maxSel} فقط`);
+im.classList.add('sel');
+selected.push(src);
+}
 };
-
-// ======== وظائف الموقع ========
-function enterSite(){
-  document.getElementById("bgm").play();
-  document.getElementById("enter").classList.add("hidden");
-  document.getElementById("choose").classList.remove("hidden");
+carsGrid.appendChild(im);
+});
+cars.classList.remove('hidden');
 }
 
-function selectPrize(type){
-  currentType = type;
-  document.getElementById("choose").classList.add("hidden");
-  document.getElementById("form").classList.remove("hidden");
-  document.getElementById("title").innerText =
-    type==="uc" ? "💰 استلام شدات" : "🚗 استلام سيارات";
+function confirmCars(){
+if(selected.length!==maxSel) return alert('العدد غير صحيح');
+cars.classList.add('hidden');
+data.classList.remove('hidden');
 }
 
-function submitPrize(){
-  const code = document.getElementById("code").value.trim();
-  const id = document.getElementById("pubgId").value.trim();
-  if(!code || !id){alert("أدخل الكود و ID");return;}
-  let used = JSON.parse(localStorage.getItem(usedKey)||"[]");
-  if(used.includes(id)){alert("❌ هذا الـ ID استلم جائزة من قبل");return;}
-  if(!codes[code]){alert("❌ كود غير صحيح");return;}
-  
-  // حفظ ID لمنع التكرار
-  localStorage.setItem(usedKey,JSON.stringify([...used,id]));
-
-  const prize = codes[code];
-  if(prize.type==="uc"){
-    document.getElementById("form").classList.add("hidden");
-    document.getElementById("personalData").classList.remove("hidden");
-    document.getElementById("resultText").innerText = prize.value;
-  }else{
-    // سيارات
-    carGroup = carImages[prize.group];
-    selectedCar = [];
-    document.getElementById("form").classList.add("hidden");
-    document.getElementById("carSelect").classList.remove("hidden");
-    renderCarOptions(prize.select);
-  }
-}
-
-// ======== اختيار السيارات ========
-function renderCarOptions(maxSelect){
-  const container = document.getElementById("carOptions");
-  container.innerHTML="";
-  carGroup.forEach((src,index)=>{
-    const img = document.createElement("img");
-    img.src=src;
-    img.style.width="120px";
-    img.style.margin="5px";
-    img.style.border="2px solid #fff";
-    img.style.cursor="pointer";
-    img.onclick=function(){
-      if(selectedCar.includes(src)){
-        selectedCar = selectedCar.filter(s=>s!==src);
-        img.style.border="2px solid #fff";
-      }else{
-        if(selectedCar.length<maxSelect){
-          selectedCar.push(src);
-          img.style.border="4px solid #ff9800";
-        }else{
-          alert(`يمكنك اختيار ${maxSelect} فقط`);
-        }
-      }
-    }
-    container.appendChild(img);
-  });
-}
-
-function confirmCar(){
-  if(selectedCar.length===0){alert("اختر سياراتك أولاً");return;}
-  document.getElementById("carSelect").classList.add("hidden");
-  document.getElementById("personalData").classList.remove("hidden");
-}
-
-// ======== البيانات الشخصية ========
-function submitPersonal(){
-  const name=document.getElementById("name").value.trim();
-  const phone=document.getElementById("phone").value.trim();
-  if(!name || !phone){alert("أدخل بياناتك كاملة");return;}
-  document.getElementById("personalData").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
-  document.getElementById("resultText").innerText=
-  `شكراً لتعاملك معنا.\nسيتم إضافة الجوائز التي اخترتها (${currentType==="uc"?"شدات":"سيارات"}) إلى حسابك في PUBG Mobile خلال 48 ساعة.`;
+function finalize(){
+if(!name.value||!phone.value) return alert('أكمل البيانات');
+data.classList.add('hidden');
+result.classList.remove('hidden');
+const logs=document.getElementById('logs');
+const steps=[
+'⏳ جاري التعرف على الحساب...',
+'🔍 التحقق من البيانات...',
+'⚖️ تنفيذ الإجراءات...',
+'💰 إضافة الشحنة...',
+'✅ تم! سيتم الإضافة خلال 48 ساعة.'
+];
+let i=0;
+const it=setInterval(()=>{
+const p=document.createElement('p');
+p.className='log';
+p.innerText=steps[i++];
+logs.appendChild(p);
+if(i===steps.length) clearInterval(it);
+},1200);
 }
 </script>
 </body>
