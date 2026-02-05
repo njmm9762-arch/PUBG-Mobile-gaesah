@@ -6,32 +6,31 @@
 <title>شحن PUBG Mobile</title>
 <style>
 *{box-sizing:border-box;font-family:tahoma}
-body{margin:0;color:#fff;background:#000;overflow:hidden}
+body{margin:0;color:#fff;background:#000;overflow:hidden;position:relative}
 .hidden{display:none}
-.bg{
-position:fixed;inset:0;
-background:url('file_000000004d7471f48dc12e2aa90a41b4.png') center/cover no-repeat;
-animation:bgMove 20s linear infinite;
-}
+.bg{position:fixed;inset:0;background:url('file_000000004d7471f48dc12e2aa90a41b4.png') center/cover no-repeat;animation:bgMove 20s linear infinite;z-index:0;}
 @keyframes bgMove{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 .overlay{position:relative;z-index:2;padding:20px;text-align:center}
 .card{background:rgba(0,0,0,.65);border-radius:18px;padding:20px;margin:15px auto;max-width:420px}
 h1,h2{margin:10px 0}
-input,button{
-width:100%;padding:16px;font-size:18px;border-radius:14px;border:none;margin:8px 0
-}
-button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff}
+input,button{width:100%;padding:16px;font-size:18px;border-radius:14px;border:none;margin:8px 0}
+button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.grid img{width:100%;border-radius:14px;border:3px solid #fff;cursor:pointer}
-.grid img.sel{border-color:#ff9800}
-.log{font-size:18px;opacity:0;animation:fade .8s forwards}
+.grid img{width:100%;border-radius:14px;border:3px solid #fff;cursor:pointer;transition:transform .3s}
+.grid img.sel{border-color:#ff9800;transform:scale(1.1)}
+.log{font-size:18px;opacity:0;animation:fade .8s forwards;margin:5px 0}
 @keyframes fade{to{opacity:1}}
+/* حركة الفلوس */
+.money{position:absolute;top:-50px;font-size:24px;animation:fall 5s linear infinite;z-index:1}
+@keyframes fall{0%{top:-50px}100%{top:110%}}
+/* حركة السيارات */
+.carAnim{position:absolute;width:80px;animation:drive 8s linear infinite;z-index:1}
+@keyframes drive{0%{left:-100px}100%{left:110%}}
 </style>
 </head>
 <body>
 
 <div class="bg"></div>
-
 <audio id="bgm" loop>
 <source src="CEL8-_mRkCE.mp3" type="audio/mpeg">
 </audio>
@@ -96,10 +95,36 @@ const CODES={
 'VIP3-GOLD-7LM':{t:'car',g:'gold',n:3},
 };
 
+const moneySymbols=['💵','💰','🪙','💸'];
+const carsAnim=['IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٤٠٣٩.jpg']; // مثال على حركة سيارات
+
 function start(){
 document.getElementById('bgm').play();
 enter.classList.add('hidden');
 codeBox.classList.remove('hidden');
+animateMoney();
+animateCars();
+}
+
+function animateMoney(){
+for(let i=0;i<20;i++){
+  const m=document.createElement('div');
+  m.className='money';
+  m.style.left=Math.random()*90+'%';
+  m.style.fontSize=(15+Math.random()*20)+'px';
+  m.innerText=moneySymbols[Math.floor(Math.random()*moneySymbols.length)];
+  document.body.appendChild(m);
+}
+}
+
+function animateCars(){
+carsAnim.forEach((src,i)=>{
+  const c=document.createElement('img');
+  c.src=src;
+  c.className='carAnim';
+  c.style.top=(100+i*70)+'px';
+  document.body.appendChild(c);
+});
 }
 
 function checkCode(){
@@ -116,7 +141,7 @@ codeBox.classList.add('hidden');
 
 if(o.t==='uc'){
 mode='uc';
-ucAmount.innerText=`🎁 ستحصل على ${o.v}`;
+ucAmount.innerText=`🎁 ستستلم ${o.v}`;
 ucBox.classList.remove('hidden');
 }else{
 mode='car';
@@ -159,7 +184,10 @@ data.classList.remove('hidden');
 }
 
 function finalize(){
-if(!name.value.trim()||!phone.value.trim()) return alert('الرجاء إدخال جميع البيانات');
+const n=name.value.trim();
+const p=phone.value.trim();
+if(n.length===0 || p.length===0) return alert('الرجاء إدخال جميع البيانات');
+
 data.classList.add('hidden');
 result.classList.remove('hidden');
 const logs=document.getElementById('logs');
@@ -168,7 +196,7 @@ const steps=[
 '⏳ جاري التعرف على الحساب...',
 '🔍 التحقق من البيانات...',
 '⚖️ تنفيذ الإجراءات...',
-mode==='uc'?`💰 إضافة ${CODES[currentCode].v} إلى حسابك...`:`💰 إضافة السيارات المختارة إلى حسابك...`,
+mode==='uc'?`💰 إضافة ${CODES[currentCode].v} شدات إلى الحساب...`:`💰 إضافة السيارات المختارة إلى الحساب...`,
 '✅ تم! سيتم الإضافة خلال 48 ساعة.'
 ];
 let i=0;
@@ -181,5 +209,6 @@ if(i===steps.length) clearInterval(it);
 },1200);
 }
 </script>
+
 </body>
 </html>
