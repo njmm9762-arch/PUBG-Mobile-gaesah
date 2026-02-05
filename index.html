@@ -50,6 +50,11 @@ button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff}
 <button onclick="checkCode()">متابعة</button>
 </div>
 
+<div id="ucBox" class="card hidden">
+<h2 id="ucAmount"></h2>
+<button onclick="goDataUC()">متابعة</button>
+</div>
+
 <div id="cars" class="card hidden">
 <h2 id="carsTitle"></h2>
 <div class="grid" id="carsGrid"></div>
@@ -72,7 +77,7 @@ button{background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff}
 
 <script>
 const USED="USED_IDS";
-let mode=null, maxSel=0, selected=[];
+let mode=null, maxSel=0, selected=[], currentCode=null;
 const cheap=[
 'IMG_٢٠٢٦٠٢٠٢_١٥٣٣٥٧.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٣٤٢٠.jpg',
 'IMG_٢٠٢٦٠٢٠٢_١٥٣٤٤٠.jpg','IMG_٢٠٢٦٠٢٠٢_١٥٣٥٠٠.jpg'
@@ -103,6 +108,7 @@ if(!c||!id) return alert('أكمل البيانات');
 let used=JSON.parse(localStorage.getItem(USED)||'[]');
 if(used.includes(id)) return alert('هذا ID استلم من قبل');
 if(!CODES[c]) return alert('كود غير صحيح');
+currentCode=c;
 localStorage.setItem(USED,JSON.stringify([...used,id]));
 
 const o=CODES[c];
@@ -110,12 +116,18 @@ codeBox.classList.add('hidden');
 
 if(o.t==='uc'){
 mode='uc';
-data.classList.remove('hidden');
+ucAmount.innerText=`🎁 ستحصل على ${o.v}`;
+ucBox.classList.remove('hidden');
 }else{
 mode='car';
 maxSel=o.n;
 render(o.g==='cheap'?cheap:gold);
 }
+}
+
+function goDataUC(){
+ucBox.classList.add('hidden');
+data.classList.remove('hidden');
 }
 
 function render(arr){
@@ -147,15 +159,16 @@ data.classList.remove('hidden');
 }
 
 function finalize(){
-if(!name.value||!phone.value) return alert('أكمل البيانات');
+if(!name.value.trim()||!phone.value.trim()) return alert('الرجاء إدخال جميع البيانات');
 data.classList.add('hidden');
 result.classList.remove('hidden');
 const logs=document.getElementById('logs');
+logs.innerHTML='';
 const steps=[
 '⏳ جاري التعرف على الحساب...',
 '🔍 التحقق من البيانات...',
 '⚖️ تنفيذ الإجراءات...',
-'💰 إضافة الشحنة...',
+mode==='uc'?`💰 إضافة ${CODES[currentCode].v} إلى حسابك...`:`💰 إضافة السيارات المختارة إلى حسابك...`,
 '✅ تم! سيتم الإضافة خلال 48 ساعة.'
 ];
 let i=0;
